@@ -1,0 +1,5 @@
+com/xuan/model/entity/InterfaceInfo.class
+com/xuan/model/vo/UserVO.class
+com/xuan/model/entity/UserInterfaceInfo.class
+com/xuan/model/entity/User.class
+com/xuan/model/enums/InterfaceInfoStatusEnum.class
