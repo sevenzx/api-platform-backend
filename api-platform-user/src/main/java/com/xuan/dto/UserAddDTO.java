@@ -10,12 +10,12 @@ import java.io.Serializable;
  * @author xuan
  */
 @Data
-public class UserAddRequest implements Serializable {
+public class UserAddDTO implements Serializable {
 
     /**
      * 用户昵称
      */
-    private String userName;
+    private String username;
 
     /**
      * 账号

@@ -1,17 +1,20 @@
 package com.xuan.dto;
 
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.xuan.common.PageRequest;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
- * 用户更新请求
+ * 用户查询请求
  *
  * @author xuan
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class UserUpdateRequest implements Serializable {
+public class UserQueryDTO extends PageRequest implements Serializable {
     /**
      * id
      */
@@ -20,7 +23,7 @@ public class UserUpdateRequest implements Serializable {
     /**
      * 用户昵称
      */
-    private String userName;
+    private String username;
 
     /**
      * 账号
@@ -43,10 +46,14 @@ public class UserUpdateRequest implements Serializable {
     private String userRole;
 
     /**
-     * 密码
+     * 创建时间
      */
-    private String userPassword;
+    private Date createTime;
 
-    @TableField(exist = false)
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
     private static final long serialVersionUID = 1L;
 }

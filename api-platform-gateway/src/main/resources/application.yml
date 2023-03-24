@@ -1,0 +1,17 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: api-platform-gateway
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8088
+    gateway:
+      routes:
+        - id: user_route
+          uri: lb://api-platform-user
+          predicates:
+            - Path=/api/user/**

@@ -13,13 +13,13 @@ import org.springframework.context.annotation.Configuration;
  * @author xuan
  */
 @Configuration
-@MapperScan("com.xuan.project.mapper")
+@MapperScan("com.xuan.mapper")
 public class MyBatisPlusConfig {
 
     /**
      * 拦截器配置
      *
-     * @return
+     * @return MybatisPlusInterceptor
      */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
