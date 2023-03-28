@@ -1,7 +1,7 @@
 package com.xuan.exception;
 
-import com.xuan.common.Result;
 import com.xuan.common.ErrorCode;
+import com.xuan.common.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  *
  * @author xuan
  */
-@RestControllerAdvice
+
 @Slf4j
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(BusinessException.class)

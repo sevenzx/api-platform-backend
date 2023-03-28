@@ -1,12 +1,12 @@
 package com.xuan.aop;
 
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.xuan.annotation.AuthCheck;
 import com.xuan.common.ErrorCode;
 import com.xuan.exception.BusinessException;
 import com.xuan.model.vo.UserVO;
 import com.xuan.service.UserService;
-import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -43,21 +43,21 @@ public class AuthInterceptor {
 	 */
 	@Around("@annotation(authCheck)")
 	public Object doInterceptor(ProceedingJoinPoint joinPoint, AuthCheck authCheck) throws Throwable {
-		List<String> anyRole = Arrays.stream(authCheck.anyRole()).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+		List<String> anyRole = Arrays.stream(authCheck.anyRole()).filter(StrUtil::isNotBlank).collect(Collectors.toList());
 		String mustRole = authCheck.mustRole();
 		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
 		HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
 		// 当前登录用户
 		UserVO userVO = userService.currentUser(request);
 		// 拥有任意权限即通过
-		if (CollectionUtils.isNotEmpty(anyRole)) {
+		if (CollectionUtil.isNotEmpty(anyRole)) {
 			String userRole = userVO.getUserRole();
 			if (!anyRole.contains(userRole)) {
 				throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
 			}
 		}
 		// 必须有所有权限才通过
-		if (StringUtils.isNotBlank(mustRole)) {
+		if (StrUtil.isNotBlank(mustRole)) {
 			String userRole = userVO.getUserRole();
 			if (!mustRole.equals(userRole)) {
 				throw new BusinessException(ErrorCode.NO_AUTH_ERROR);

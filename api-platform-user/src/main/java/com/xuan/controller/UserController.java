@@ -96,6 +96,16 @@ public class UserController {
 		return Result.success(userVO);
 	}
 
+	@PostMapping("/current")
+	public Result<UserVO> getCurrentUserByPost(HttpServletRequest request) {
+		Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+		if (userObj == null) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		UserVO userVO = userService.currentUser(request);
+		return Result.success(userVO);
+	}
+
 	/**
 	 * 用户注销
 	 *
@@ -173,12 +183,11 @@ public class UserController {
 	/**
 	 * 根据 id 获取用户
 	 *
-	 * @param id      id
-	 * @param request HttpServletRequest
+	 * @param id id
 	 * @return Result<UserVO>
 	 */
 	@GetMapping("/get/{id}")
-	public Result<UserVO> getUserById(@PathVariable("id") Long id, HttpServletRequest request) {
+	public Result<UserVO> getUserById(@PathVariable("id") Long id) {
 		if (id <= 0L) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
@@ -238,7 +247,8 @@ public class UserController {
 	 * @param request HttpServletRequest
 	 * @return boolean
 	 */
-	private boolean hasAdminPermission(HttpServletRequest request) {
+	@GetMapping(value = "/current/isAdmin")
+	public boolean hasAdminPermission(HttpServletRequest request) {
 		Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
 		if (userObj == null) {
 			return false;

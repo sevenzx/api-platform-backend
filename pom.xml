@@ -8,8 +8,10 @@
     <packaging>pom</packaging>
     <modules>
         <module>api-platform-common</module>
-        <module>api-platform-user</module>
+        <module>api-platform-feign-api</module>
         <module>api-platform-gateway</module>
+        <module>api-platform-user</module>
+        <module>api-platform-interface-info</module>
     </modules>
 
     <!-- 统一管理jar包版本 -->

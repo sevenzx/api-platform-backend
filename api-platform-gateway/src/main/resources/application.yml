@@ -15,3 +15,7 @@ spring:
           uri: lb://api-platform-user
           predicates:
             - Path=/api/user/**
+        - id: interface_info_route
+          uri: lb://api-platform-interface-info
+          predicates:
+            - Path=/api/interface/info/**
