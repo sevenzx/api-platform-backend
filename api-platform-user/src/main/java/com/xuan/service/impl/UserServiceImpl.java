@@ -199,7 +199,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 		// 拿到基础字段
 		long current = userQueryDTO.getCurrent();
 		long pageSize = userQueryDTO.getPageSize();
-		String sortField = userQueryDTO.getSortField();
+		String sortField = StrUtil.toUnderlineCase(userQueryDTO.getSortField());
 		String username = userQueryDTO.getUsername();
 		boolean isAscend = userQueryDTO.isAscend();
 		boolean needTotal = userQueryDTO.isNeedTotal();
