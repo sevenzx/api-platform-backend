@@ -4,7 +4,8 @@ server:
 spring:
   application:
     name: api-platform-gateway
-
+  main:
+    web-application-type: reactive
   cloud:
     nacos:
       discovery:
@@ -19,3 +20,23 @@ spring:
           uri: lb://api-platform-interface-info
           predicates:
             - Path=/api/interface/info/**
+        - id: interface_v1_route
+          uri: lb://api-platform-interface-v1
+          predicates:
+            - Path=/api/v1/**
+
+
+# Feign调试日志是以debug级别来输出的，而springboot的默认日志级别是info，可以仅仅指定Feign接口所在包的路径为debug级别
+logging:
+  level:
+    com.xuan.client: debug
+
+feign:
+  client:
+    config:
+      default:
+        logger-level: BASIC
+  httpclient:
+    enabled: true
+    max-connections: 200
+    max-connections-per-route: 50

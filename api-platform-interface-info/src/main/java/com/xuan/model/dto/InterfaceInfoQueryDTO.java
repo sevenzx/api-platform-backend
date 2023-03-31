@@ -1,17 +1,25 @@
-package com.xuan.dto;
+package com.xuan.model.dto;
 
+import com.xuan.common.PageRequest;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
 
 /**
- * 创建请求
+ * 查询请求
  *
  * @author xuan
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class InterfaceInfoAddDTO implements Serializable {
+public class InterfaceInfoQueryDTO extends PageRequest implements Serializable {
+
+	/**
+	 * 主键
+	 */
+	private Long id;
 
 	/**
 	 * 名称
@@ -44,8 +52,18 @@ public class InterfaceInfoAddDTO implements Serializable {
 	private String responseHeader;
 
 	/**
+	 * 接口状态（0-关闭，1-开启）
+	 */
+	private Integer status;
+
+	/**
 	 * 请求类型
 	 */
 	private String method;
+
+	/**
+	 * 创建人
+	 */
+	private Long userId;
 
 }

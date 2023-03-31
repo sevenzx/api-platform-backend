@@ -1,6 +1,7 @@
 package com.xuan.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xuan.dto.*;
 import com.xuan.model.entity.User;
 import com.xuan.common.Result;
@@ -8,6 +9,7 @@ import com.xuan.common.DeleteRequest;
 import com.xuan.common.ErrorCode;
 import com.xuan.exception.BusinessException;
 import com.xuan.model.enums.UserRoleEnum;
+import com.xuan.model.vo.InvokeInterfaceUserVO;
 import com.xuan.model.vo.PageVO;
 import com.xuan.model.vo.UserVO;
 import com.xuan.service.UserService;
@@ -237,6 +239,19 @@ public class UserController {
 		}
 		PageVO<UserVO> pageVO = userService.listUserByPage(userQueryDTO);
 		return Result.success(pageVO);
+	}
+
+	@GetMapping("/get/secret")
+	public Result<InvokeInterfaceUserVO> getSecretByKey(@RequestParam(value = "userKey") String userKey) {
+		LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(User::getUserKey, userKey);
+		User user = userService.getOne(queryWrapper);
+		InvokeInterfaceUserVO invokeInterfaceUserVO = new InvokeInterfaceUserVO();
+		if (user != null) {
+			invokeInterfaceUserVO.setId(user.getId());
+			invokeInterfaceUserVO.setUserSecret(user.getUserSecret());
+		}
+		return Result.success(invokeInterfaceUserVO);
 	}
 
 	// endregion

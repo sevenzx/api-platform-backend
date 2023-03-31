@@ -1,10 +1,12 @@
 package com.xuan.client;
 
 import com.xuan.common.Result;
+import com.xuan.model.vo.InvokeInterfaceUserVO;
 import com.xuan.model.vo.UserVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author: xuan
@@ -29,6 +31,15 @@ public interface UserClient {
 	 */
 	@GetMapping(value = "/current/isAdmin")
 	boolean currentUserIsAdmin();
+
+	/**
+	 * 通过key获取secret
+	 *
+	 * @param userKey user key
+	 * @return Result<String>
+	 */
+	@GetMapping("/get/secret")
+	Result<InvokeInterfaceUserVO> getSecretByKey(@RequestParam(value = "userKey") String userKey);
 
 	/**
 	 * 根据 id 获取用户

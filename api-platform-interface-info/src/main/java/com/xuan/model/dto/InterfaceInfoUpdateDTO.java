@@ -1,4 +1,4 @@
-package com.xuan.dto;
+package com.xuan.model.dto;
 
 import lombok.Data;
 

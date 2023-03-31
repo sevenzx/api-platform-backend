@@ -44,6 +44,12 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>com.xuan</groupId>
+            <artifactId>api-platform-feign-api</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
     </dependencies>
 
 </project>

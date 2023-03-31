@@ -12,6 +12,7 @@
         <module>api-platform-gateway</module>
         <module>api-platform-user</module>
         <module>api-platform-interface-info</module>
+        <module>api-platform-interface-v1</module>
     </modules>
 
     <!-- 统一管理jar包版本 -->

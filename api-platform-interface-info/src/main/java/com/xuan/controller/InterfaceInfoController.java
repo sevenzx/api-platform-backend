@@ -2,15 +2,15 @@ package com.xuan.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xuan.client.UserClient;
-import com.xuan.dto.InterfaceInfoAddDTO;
+import com.xuan.model.dto.InterfaceInfoAddDTO;
 import com.xuan.model.entity.InterfaceInfo;
 import com.xuan.common.*;
 import com.xuan.exception.BusinessException;
 
 import com.xuan.model.vo.PageVO;
 import com.xuan.service.InterfaceInfoService;
-import com.xuan.dto.InterfaceInfoQueryDTO;
-import com.xuan.dto.InterfaceInfoUpdateDTO;
+import com.xuan.model.dto.InterfaceInfoQueryDTO;
+import com.xuan.model.dto.InterfaceInfoUpdateDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;

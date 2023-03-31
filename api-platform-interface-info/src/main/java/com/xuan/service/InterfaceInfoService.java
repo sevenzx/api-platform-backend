@@ -3,9 +3,9 @@ package com.xuan.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xuan.common.DeleteRequest;
 import com.xuan.common.IdRequest;
-import com.xuan.dto.InterfaceInfoAddDTO;
-import com.xuan.dto.InterfaceInfoQueryDTO;
-import com.xuan.dto.InterfaceInfoUpdateDTO;
+import com.xuan.model.dto.InterfaceInfoAddDTO;
+import com.xuan.model.dto.InterfaceInfoQueryDTO;
+import com.xuan.model.dto.InterfaceInfoUpdateDTO;
 import com.xuan.model.entity.InterfaceInfo;
 import com.xuan.model.vo.PageVO;
 

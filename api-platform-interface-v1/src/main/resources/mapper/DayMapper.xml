@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xuan.mapper.DayMapper">
+
+    <resultMap id="BaseResultMap" type="com.xuan.model.entity.Day">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="date" column="date" jdbcType="INTEGER"/>
+            <result property="dateStr" column="date_str" jdbcType="VARCHAR"/>
+            <result property="year" column="year" jdbcType="INTEGER"/>
+            <result property="yearDay" column="year_day" jdbcType="INTEGER"/>
+            <result property="week" column="week" jdbcType="INTEGER"/>
+            <result property="weekend" column="weekend" jdbcType="TINYINT"/>
+            <result property="workday" column="workday" jdbcType="TINYINT"/>
+            <result property="holiday" column="holiday" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,date,date_str,
+        year,year_day,week,
+        weekend,workday,holiday,
+        create_time,update_time,is_deleted
+    </sql>
+</mapper>
