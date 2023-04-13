@@ -53,14 +53,14 @@ public class AuthInterceptor {
 		if (CollectionUtil.isNotEmpty(anyRole)) {
 			String userRole = userVO.getUserRole();
 			if (!anyRole.contains(userRole)) {
-				throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+				throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 			}
 		}
 		// 必须有所有权限才通过
 		if (StrUtil.isNotBlank(mustRole)) {
 			String userRole = userVO.getUserRole();
 			if (!mustRole.equals(userRole)) {
-				throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+				throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 			}
 		}
 		// 通过权限校验，放行

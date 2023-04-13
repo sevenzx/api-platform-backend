@@ -107,7 +107,7 @@ public class InterfaceInfoController {
 	public Result<List<InterfaceInfo>> listInterfaceInfo(InterfaceInfoQueryDTO interfaceInfoQueryDTO) {
 		boolean currentUserIsAdmin = userClient.currentUserIsAdmin();
 		if (!currentUserIsAdmin) {
-			throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}
 		InterfaceInfo interfaceInfoQuery = new InterfaceInfo();
 		if (interfaceInfoQueryDTO != null) {
@@ -143,7 +143,7 @@ public class InterfaceInfoController {
 	public Result<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest) {
 		boolean currentUserIsAdmin = userClient.currentUserIsAdmin();
 		if (!currentUserIsAdmin) {
-			throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}
 		boolean isSuccessful = interfaceInfoService.onlineInterfaceInfo(idRequest);
 		return Result.success(isSuccessful);
@@ -159,7 +159,7 @@ public class InterfaceInfoController {
 	public Result<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest) {
 		boolean currentUserIsAdmin = userClient.currentUserIsAdmin();
 		if (!currentUserIsAdmin) {
-			throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}
 		boolean isSuccessful = interfaceInfoService.offlineInterfaceInfo(idRequest);
 		return Result.success(isSuccessful);

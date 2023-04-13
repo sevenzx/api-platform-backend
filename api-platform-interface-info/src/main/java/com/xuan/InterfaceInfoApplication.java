@@ -1,5 +1,6 @@
 package com.xuan;
 
+import com.xuan.client.InvokeInterfaceClient;
 import com.xuan.client.UserClient;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -12,7 +13,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @since: 2023/3/28
  */
 
-@EnableFeignClients(clients = {UserClient.class})
+@EnableFeignClients(clients = {UserClient.class, InvokeInterfaceClient.class})
 @EnableDiscoveryClient
 @SpringBootApplication
 @MapperScan("com.xuan.mapper")

@@ -25,8 +25,9 @@ class InterfaceInfoControllerTest {
 
 	@Test
 	void testClient(){
-		Result<InvokeInterfaceUserVO> result = userClient.getSecretByKey("abc");
+		Result<InvokeInterfaceUserVO> result = userClient.getSecretByKey("cli_a7b88600e2877bd3c0b81e5e760885da");
 		System.out.println(result);
+
 	}
 
 }

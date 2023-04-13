@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author: xuan
@@ -16,16 +17,23 @@ import javax.annotation.Resource;
  */
 
 @RestController
-@RequestMapping("/day")
+@RequestMapping(value = "/day")
 public class DayController {
 
 	@Resource
 	DayService dayService;
 
-	@GetMapping()
-	Result<DayVO> selectOneDay(@RequestParam(value = "date") String date) {
-		DayVO dayVO = dayService.selectOneDay(date);
+	@GetMapping(value = "/get")
+	Result<DayVO> getOneDay(@RequestParam(value = "date") String date) {
+		DayVO dayVO = dayService.getOneDay(date);
 		return Result.success(dayVO);
+	}
+
+	@GetMapping(value = "/list")
+	Result<List<DayVO>> listDayFromStartToEnd(@RequestParam(value = "startDate") String startDate,
+	                                          @RequestParam(value = "endDate") String endDate) {
+		List<DayVO> list = dayService.listDayFromStartToEnd(startDate, endDate);
+		return Result.success(list);
 	}
 
 }

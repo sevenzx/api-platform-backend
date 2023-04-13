@@ -209,14 +209,14 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 		}
 		// 仅本人或管理员可操作
 		if (!interfaceInfo.getUserId().equals(userVO.getId()) && !userClient.currentUserIsAdmin()) {
-			throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}
 	}
 
 	private void checkAdmin() {
 		boolean currentUserIsAdmin = userClient.currentUserIsAdmin();
 		if (!currentUserIsAdmin) {
-			throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}
 	}
 }

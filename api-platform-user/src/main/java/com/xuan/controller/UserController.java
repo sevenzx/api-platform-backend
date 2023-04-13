@@ -232,7 +232,7 @@ public class UserController {
 	@PostMapping("/list/page")
 	public Result<PageVO<UserVO>> listUserByPage(@RequestBody UserQueryDTO userQueryDTO, HttpServletRequest request) {
 		if (!hasAdminPermission(request)) {
-			throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}
 		if (userQueryDTO == null) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
