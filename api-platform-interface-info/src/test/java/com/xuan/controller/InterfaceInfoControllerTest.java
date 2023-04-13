@@ -1,14 +1,7 @@
 package com.xuan.controller;
 
-import com.xuan.client.InvokeInterfaceClient;
-import com.xuan.client.UserClient;
-import com.xuan.common.Result;
-import com.xuan.model.vo.InvokeInterfaceUserVO;
-import com.xuan.model.vo.UserVO;
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
 
 /**
  * @author: xuan
@@ -17,17 +10,6 @@ import javax.annotation.Resource;
 
 @SpringBootTest
 class InterfaceInfoControllerTest {
-	@Resource
-	private UserClient userClient;
 
-	@Resource
-	private InvokeInterfaceClient invokeInterfaceClient;
-
-	@Test
-	void testClient(){
-		Result<InvokeInterfaceUserVO> result = userClient.getSecretByKey("cli_a7b88600e2877bd3c0b81e5e760885da");
-		System.out.println(result);
-
-	}
 
 }

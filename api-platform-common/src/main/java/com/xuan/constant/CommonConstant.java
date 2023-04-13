@@ -8,6 +8,11 @@ package com.xuan.constant;
 public interface CommonConstant {
 
     /**
+     * 用户登录态键
+     */
+    String USER_LOGIN_STATE = "userLoginState";
+
+    /**
      * 升序
      */
     String SORT_ORDER_ASC = "ascend";

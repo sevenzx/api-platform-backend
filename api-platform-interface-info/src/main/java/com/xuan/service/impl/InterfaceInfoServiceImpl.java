@@ -5,11 +5,9 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.xuan.client.UserClient;
 import com.xuan.common.DeleteRequest;
 import com.xuan.common.ErrorCode;
 import com.xuan.common.IdRequest;
-import com.xuan.common.Result;
 import com.xuan.model.dto.InterfaceInfoAddDTO;
 import com.xuan.model.dto.InterfaceInfoQueryDTO;
 import com.xuan.model.dto.InterfaceInfoUpdateDTO;
@@ -20,12 +18,13 @@ import com.xuan.model.enums.InterfaceInfoStatusEnum;
 import com.xuan.model.vo.PageVO;
 import com.xuan.model.vo.UserVO;
 import com.xuan.service.InterfaceInfoService;
+import com.xuan.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import static com.xuan.constant.CommonConstant.MAX_PAGE_SIZE;
 
@@ -40,11 +39,9 @@ import static com.xuan.constant.CommonConstant.MAX_PAGE_SIZE;
 public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, InterfaceInfo>
 		implements InterfaceInfoService {
 
-	@Resource
-	private UserClient userClient;
 
 	@Override
-	public long addInterfaceInfo(InterfaceInfoAddDTO interfaceInfoAddDTO) {
+	public long addInterfaceInfo(InterfaceInfoAddDTO interfaceInfoAddDTO, HttpServletRequest request) {
 		if (interfaceInfoAddDTO == null) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
@@ -53,8 +50,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 		// 校验
 		this.validInterfaceInfo(interfaceInfo, true);
 		// 设置当前用户id
-		Result<UserVO> userVOResult = userClient.getCurrentUser();
-		UserVO userVO = userVOResult.getData();
+		UserVO userVO = UserUtil.currentUser(request);
 		interfaceInfo.setUserId(userVO.getId());
 		boolean result = this.save(interfaceInfo);
 		if (!result) {
@@ -64,17 +60,17 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 	}
 
 	@Override
-	public boolean deleteInterfaceInfo(DeleteRequest deleteRequest) {
+	public boolean deleteInterfaceInfo(DeleteRequest deleteRequest, HttpServletRequest request) {
 		if (deleteRequest == null || deleteRequest.getId() <= 0L) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
 		Long id = deleteRequest.getId();
-		this.checkPermission(id);
+		this.checkPermission(id, request);
 		return this.removeById(id);
 	}
 
 	@Override
-	public boolean updateInterfaceInfo(InterfaceInfoUpdateDTO interfaceInfoUpdateDTO) {
+	public boolean updateInterfaceInfo(InterfaceInfoUpdateDTO interfaceInfoUpdateDTO, HttpServletRequest request) {
 		if (interfaceInfoUpdateDTO == null || interfaceInfoUpdateDTO.getId() <= 0) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
@@ -82,7 +78,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 		BeanUtils.copyProperties(interfaceInfoUpdateDTO, interfaceInfo);
 		// 参数校验
 		this.validInterfaceInfo(interfaceInfo, false);
-		this.checkPermission(interfaceInfoUpdateDTO.getId());
+		this.checkPermission(interfaceInfoUpdateDTO.getId(), request);
 		return this.updateById(interfaceInfo);
 	}
 
@@ -124,8 +120,8 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 	}
 
 	@Override
-	public boolean onlineInterfaceInfo(IdRequest idRequest) {
-		this.checkAdmin();
+	public boolean onlineInterfaceInfo(IdRequest idRequest, HttpServletRequest request) {
+		this.checkAdmin(request);
 		if (idRequest == null || idRequest.getId() < 0) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
@@ -139,12 +135,6 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 		// 判断接口是否能使用
 		// TODO 根据测试地址来调用
 		// 这里我先用固定的方法进行测试，后面来改
-		// UserVO user = new UserVO();
-		// user.setUsername("MARS");
-		// String name = xuanApiClient.getNameByPostWithJson(user);
-		// if (StrUtil.isBlank(name)) {
-		// 	throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证失败");
-		// }
 
 		// 更新数据库
 		InterfaceInfo interfaceInfo = new InterfaceInfo();
@@ -154,8 +144,8 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 	}
 
 	@Override
-	public boolean offlineInterfaceInfo(IdRequest idRequest) {
-		this.checkAdmin();
+	public boolean offlineInterfaceInfo(IdRequest idRequest, HttpServletRequest request) {
+		this.checkAdmin(request);
 		if (idRequest == null || idRequest.getId() < 0) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
@@ -199,22 +189,21 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 		}
 	}
 
-	private void checkPermission(Long interfaceInfoId) {
-		Result<UserVO> userVOResult = userClient.getCurrentUser();
-		UserVO userVO = userVOResult.getData();
+	private void checkPermission(Long interfaceInfoId, HttpServletRequest request) {
+		UserVO userVO = UserUtil.currentUser(request);
 		// 判断是否存在
 		InterfaceInfo interfaceInfo = this.getById(interfaceInfoId);
 		if (interfaceInfo == null) {
 			throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
 		}
 		// 仅本人或管理员可操作
-		if (!interfaceInfo.getUserId().equals(userVO.getId()) && !userClient.currentUserIsAdmin()) {
+		if (!interfaceInfo.getUserId().equals(userVO.getId()) && !UserUtil.hasAdminPermission(request)) {
 			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}
 	}
 
-	private void checkAdmin() {
-		boolean currentUserIsAdmin = userClient.currentUserIsAdmin();
+	private void checkAdmin(HttpServletRequest request) {
+		boolean currentUserIsAdmin = UserUtil.hasAdminPermission(request);
 		if (!currentUserIsAdmin) {
 			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}

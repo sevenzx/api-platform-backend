@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import static com.xuan.constant.UserConstant.USER_LOGIN_STATE;
+import static com.xuan.constant.CommonConstant.USER_LOGIN_STATE;
 
 /**
  * 用户接口
@@ -98,16 +98,6 @@ public class UserController {
 		return Result.success(userVO);
 	}
 
-	@PostMapping("/current")
-	public Result<UserVO> getCurrentUserByPost(HttpServletRequest request) {
-		Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-		if (userObj == null) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR);
-		}
-		UserVO userVO = userService.currentUser(request);
-		return Result.success(userVO);
-	}
-
 	/**
 	 * 用户注销
 	 *
@@ -123,19 +113,14 @@ public class UserController {
 		return Result.success(result);
 	}
 
-	// endregion
-
-	// region 增删改查
-
 	/**
 	 * 创建用户
 	 *
 	 * @param userAddDTO UserAddDTO
-	 * @param request    HttpServletRequest
 	 * @return Result<Long>
 	 */
 	@PostMapping("/add")
-	public Result<Long> addUser(@RequestBody UserAddDTO userAddDTO, HttpServletRequest request) {
+	public Result<Long> addUser(@RequestBody UserAddDTO userAddDTO) {
 		if (userAddDTO == null) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
@@ -152,11 +137,10 @@ public class UserController {
 	 * 删除用户
 	 *
 	 * @param deleteRequest DeleteRequest
-	 * @param request       HttpServletRequest
 	 * @return Result<Boolean>
 	 */
 	@PostMapping("/delete")
-	public Result<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+	public Result<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest) {
 		if (deleteRequest == null || deleteRequest.getId() <= 0) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
@@ -168,11 +152,10 @@ public class UserController {
 	 * 更新用户
 	 *
 	 * @param userUpdateDTO UserUpdateDTO
-	 * @param request       HttpServletRequest
 	 * @return Result<Boolean>
 	 */
 	@PostMapping("/update")
-	public Result<Boolean> updateUser(@RequestBody UserUpdateDTO userUpdateDTO, HttpServletRequest request) {
+	public Result<Boolean> updateUser(@RequestBody UserUpdateDTO userUpdateDTO) {
 		if (userUpdateDTO == null || userUpdateDTO.getId() == null) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
@@ -198,29 +181,6 @@ public class UserController {
 		BeanUtils.copyProperties(user, userVO);
 		return Result.success(userVO);
 	}
-
-	// /**
-	//  * 获取用户列表
-	//  *
-	//  * @param userQueryRequest
-	//  * @param request
-	//  * @return
-	//  */
-	// @GetMapping("/list")
-	// public Result<List<UserVO>> listUser(UserQueryDTO userQueryRequest, HttpServletRequest request) {
-	// 	User userQuery = new User();
-	// 	if (userQueryRequest != null) {
-	// 		BeanUtils.copyProperties(userQueryRequest, userQuery);
-	// 	}
-	// 	QueryWrapper<User> queryWrapper = new QueryWrapper<>(userQuery);
-	// 	List<User> userList = userService.list(queryWrapper);
-	// 	List<UserVO> userVOList = userList.stream().map(user -> {
-	// 		UserVO userVO = new UserVO();
-	// 		BeanUtils.copyProperties(user, userVO);
-	// 		return userVO;
-	// 	}).collect(Collectors.toList());
-	// 	return Result.success(userVOList);
-	// }
 
 	/**
 	 * 用户翻页查询
@@ -254,7 +214,6 @@ public class UserController {
 		return Result.success(invokeInterfaceUserVO);
 	}
 
-	// endregion
 
 	/**
 	 * 是否有管理员权限
@@ -262,7 +221,6 @@ public class UserController {
 	 * @param request HttpServletRequest
 	 * @return boolean
 	 */
-	@GetMapping(value = "/current/isAdmin")
 	public boolean hasAdminPermission(HttpServletRequest request) {
 		Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
 		if (userObj == null) {

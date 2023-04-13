@@ -17,26 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UserClient {
 
 	/**
-	 * 当前登录用户
-	 *
-	 * @return UserVO
-	 */
-	@GetMapping(value = "/current")
-	Result<UserVO> getCurrentUser();
-
-	/**
-	 * 是否有管理员权限
-	 *
-	 * @return boolean
-	 */
-	@GetMapping(value = "/current/isAdmin")
-	boolean currentUserIsAdmin();
-
-	/**
-	 * 通过key获取secret
+	 * 通过key获取secret和用户id
 	 *
 	 * @param userKey user key
-	 * @return Result<String>
+	 * @return Result<InvokeInterfaceUserVO>
 	 */
 	@GetMapping("/get/secret")
 	Result<InvokeInterfaceUserVO> getSecretByKey(@RequestParam(value = "userKey") String userKey);

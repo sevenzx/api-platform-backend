@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.xuan.constant.CommonConstant.MAX_PAGE_SIZE;
-import static com.xuan.constant.UserConstant.USER_LOGIN_STATE;
+import static com.xuan.constant.CommonConstant.USER_LOGIN_STATE;
 
 /**
  * @author: xuan

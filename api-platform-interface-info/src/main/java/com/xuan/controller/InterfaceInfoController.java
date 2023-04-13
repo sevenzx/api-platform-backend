@@ -1,21 +1,23 @@
 package com.xuan.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xuan.client.UserClient;
 import com.xuan.model.dto.InterfaceInfoAddDTO;
 import com.xuan.model.entity.InterfaceInfo;
 import com.xuan.common.*;
 import com.xuan.exception.BusinessException;
 
 import com.xuan.model.vo.PageVO;
+import com.xuan.model.vo.UserVO;
 import com.xuan.service.InterfaceInfoService;
 import com.xuan.model.dto.InterfaceInfoQueryDTO;
 import com.xuan.model.dto.InterfaceInfoUpdateDTO;
+import com.xuan.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
@@ -33,8 +35,12 @@ public class InterfaceInfoController {
 	@Resource
 	private InterfaceInfoService interfaceInfoService;
 
-	@Resource
-	private UserClient userClient;
+	@GetMapping("/test")
+	public Result<UserVO> testUserClient(HttpServletRequest request) {
+		Object userLoginState = request.getSession().getAttribute("userLoginState");
+		System.out.println("userLoginState = " + userLoginState);
+		return Result.success(null);
+	}
 
 
 	/**
@@ -44,11 +50,11 @@ public class InterfaceInfoController {
 	 * @return 数据库主键id
 	 */
 	@PostMapping("/add")
-	public Result<Long> addInterfaceInfo(@RequestBody InterfaceInfoAddDTO interfaceInfoAddDTO) {
+	public Result<Long> addInterfaceInfo(@RequestBody InterfaceInfoAddDTO interfaceInfoAddDTO, HttpServletRequest request) {
 		if (interfaceInfoAddDTO == null) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
-		long id = interfaceInfoService.addInterfaceInfo(interfaceInfoAddDTO);
+		long id = interfaceInfoService.addInterfaceInfo(interfaceInfoAddDTO, request);
 		return Result.success(id);
 	}
 
@@ -59,11 +65,11 @@ public class InterfaceInfoController {
 	 * @return 是否成功
 	 */
 	@PostMapping("/delete")
-	public Result<Boolean> deleteInterfaceInfo(@RequestBody DeleteRequest deleteRequest) {
+	public Result<Boolean> deleteInterfaceInfo(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
 		if (deleteRequest == null || deleteRequest.getId() <= 0) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
-		boolean isSuccessful = interfaceInfoService.deleteInterfaceInfo(deleteRequest);
+		boolean isSuccessful = interfaceInfoService.deleteInterfaceInfo(deleteRequest, request);
 		return Result.success(isSuccessful);
 	}
 
@@ -74,11 +80,11 @@ public class InterfaceInfoController {
 	 * @return 是否成功
 	 */
 	@PostMapping("/update")
-	public Result<Boolean> updateInterfaceInfo(@RequestBody InterfaceInfoUpdateDTO interfaceInfoUpdateDTO) {
+	public Result<Boolean> updateInterfaceInfo(@RequestBody InterfaceInfoUpdateDTO interfaceInfoUpdateDTO, HttpServletRequest request) {
 		if (interfaceInfoUpdateDTO == null || interfaceInfoUpdateDTO.getId() <= 0) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
-		boolean isSuccessful = interfaceInfoService.updateInterfaceInfo(interfaceInfoUpdateDTO);
+		boolean isSuccessful = interfaceInfoService.updateInterfaceInfo(interfaceInfoUpdateDTO, request);
 		return Result.success(isSuccessful);
 	}
 
@@ -104,8 +110,8 @@ public class InterfaceInfoController {
 	 * @return List<InterfaceInfo>
 	 */
 	@GetMapping("/list")
-	public Result<List<InterfaceInfo>> listInterfaceInfo(InterfaceInfoQueryDTO interfaceInfoQueryDTO) {
-		boolean currentUserIsAdmin = userClient.currentUserIsAdmin();
+	public Result<List<InterfaceInfo>> listInterfaceInfo(InterfaceInfoQueryDTO interfaceInfoQueryDTO, HttpServletRequest request) {
+		boolean currentUserIsAdmin = UserUtil.hasAdminPermission(request);
 		if (!currentUserIsAdmin) {
 			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}
@@ -140,12 +146,12 @@ public class InterfaceInfoController {
 	 * @return 是否上线成功
 	 */
 	@PostMapping("/online")
-	public Result<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest) {
-		boolean currentUserIsAdmin = userClient.currentUserIsAdmin();
+	public Result<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest, HttpServletRequest request) {
+		boolean currentUserIsAdmin = UserUtil.hasAdminPermission(request);
 		if (!currentUserIsAdmin) {
 			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}
-		boolean isSuccessful = interfaceInfoService.onlineInterfaceInfo(idRequest);
+		boolean isSuccessful = interfaceInfoService.onlineInterfaceInfo(idRequest, request);
 		return Result.success(isSuccessful);
 	}
 
@@ -156,12 +162,12 @@ public class InterfaceInfoController {
 	 * @return 是否下线成功
 	 */
 	@PostMapping("/offline")
-	public Result<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest) {
-		boolean currentUserIsAdmin = userClient.currentUserIsAdmin();
+	public Result<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest, HttpServletRequest request) {
+		boolean currentUserIsAdmin = UserUtil.hasAdminPermission(request);
 		if (!currentUserIsAdmin) {
 			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
 		}
-		boolean isSuccessful = interfaceInfoService.offlineInterfaceInfo(idRequest);
+		boolean isSuccessful = interfaceInfoService.offlineInterfaceInfo(idRequest, request);
 		return Result.success(isSuccessful);
 	}
 
