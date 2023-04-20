@@ -108,6 +108,9 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
 			return handleNoPermission(response, "timestamp is invalid");
 		}
 		// TODO 请求的接口是否存在 使用路径, 请求方法去查数据库
+		// SELECT * FROM invoke_interface
+		// WHERE `id` = 1
+		// AND `interface_info_id` = ( SELECT `id` FROM interface_info WHERE`url` = 'http://localhost:8888' AND `method` = 'POST' )
 
 		long interfaceInfoId = 1L;
 		Result<Boolean> booleanResult = invokeInterfaceClient.hasInvokeNum(userId, interfaceInfoId);

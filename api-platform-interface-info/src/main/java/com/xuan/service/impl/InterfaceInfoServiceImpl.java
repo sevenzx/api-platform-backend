@@ -20,7 +20,6 @@ import com.xuan.model.vo.UserVO;
 import com.xuan.service.InterfaceInfoService;
 import com.xuan.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -104,8 +103,8 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
 		}
 		QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>(interfaceInfoQuery);
-		queryWrapper.like(StringUtils.isNotBlank(description), "description", description);
-		queryWrapper.orderBy(StringUtils.isNotBlank(sortField), ascend, sortField);
+		queryWrapper.like(StrUtil.isNotBlank(description), "description", description);
+		queryWrapper.orderBy(StrUtil.isNotBlank(sortField), ascend, sortField);
 
 		Page<InterfaceInfo> interfaceInfoPage = new Page<>(current, pageSize);
 		// 设置是否需要翻页
@@ -181,10 +180,10 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 				throw new BusinessException(ErrorCode.PARAMS_ERROR);
 			}
 		}
-		if (StringUtils.isNotBlank(name) && name.length() > 50) {
+		if (StrUtil.isNotBlank(name) && name.length() > 50) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR, "名字过长");
 		}
-		if (StringUtils.isNotBlank(description) && description.length() > 512) {
+		if (StrUtil.isNotBlank(description) && description.length() > 512) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR, "描述过长");
 		}
 	}
