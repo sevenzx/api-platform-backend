@@ -31,7 +31,7 @@ public class PageRequest {
 	private boolean ascend = true;
 
 	/**
-	 * 是否查询总量total 默认位true
+	 * 是否查询总量total 默认为true
 	 */
 	private boolean needTotal = true;
 }

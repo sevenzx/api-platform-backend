@@ -1,15 +1,14 @@
 package com.xuan.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.xuan.common.DeleteRequest;
-import com.xuan.common.ErrorCode;
-import com.xuan.common.IdRequest;
+import com.xuan.common.*;
 import com.xuan.model.dto.InterfaceInfoAddDTO;
-import com.xuan.model.dto.InterfaceInfoQueryDTO;
 import com.xuan.model.dto.InterfaceInfoUpdateDTO;
 import com.xuan.exception.BusinessException;
 import com.xuan.mapper.InterfaceInfoMapper;
@@ -24,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 import static com.xuan.constant.CommonConstant.MAX_PAGE_SIZE;
 
@@ -82,40 +82,68 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 	}
 
 	@Override
-	public PageVO<InterfaceInfo> listInterfaceInfoByPage(InterfaceInfoQueryDTO interfaceInfoQueryDTO) {
-		if (interfaceInfoQueryDTO == null) {
+	public PageVO<InterfaceInfo> listInterfaceInfoByPage(PageRequest pageRequest) {
+		if (pageRequest == null) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
-		InterfaceInfo interfaceInfoQuery = new InterfaceInfo();
-		BeanUtils.copyProperties(interfaceInfoQueryDTO, interfaceInfoQuery);
-
-		// 基础字段
-		long current = interfaceInfoQueryDTO.getCurrent();
-		long pageSize = interfaceInfoQueryDTO.getPageSize();
-		boolean ascend = interfaceInfoQueryDTO.isAscend();
-		boolean needTotal = interfaceInfoQueryDTO.isNeedTotal();
-		String sortField = StrUtil.toUnderlineCase(interfaceInfoQueryDTO.getSortField());
-		String description = interfaceInfoQuery.getDescription();
-		// description 需支持模糊搜索
-		interfaceInfoQuery.setDescription(null);
+		// 拿到分页参数
+		long current = pageRequest.getCurrent();
+		long pageSize = pageRequest.getPageSize();
+		boolean needTotal = pageRequest.isNeedTotal();
 		// 限制爬虫
 		if (pageSize > MAX_PAGE_SIZE) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
 		}
-		QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>(interfaceInfoQuery);
-		queryWrapper.like(StrUtil.isNotBlank(description), "description", description);
-		queryWrapper.orderBy(StrUtil.isNotBlank(sortField), ascend, sortField);
-
-		Page<InterfaceInfo> interfaceInfoPage = new Page<>(current, pageSize);
+		// 更新时间倒序
+		LambdaQueryWrapper<InterfaceInfo> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.orderByDesc(InterfaceInfo::getUpdateTime);
+		Page<InterfaceInfo> queryPage = new Page<>(current, pageSize);
 		// 设置是否需要翻页
-		interfaceInfoPage.setSearchCount(needTotal);
+		queryPage.setSearchCount(needTotal);
 		try {
-			interfaceInfoPage = this.page(interfaceInfoPage, queryWrapper);
+			queryPage = this.page(queryPage, queryWrapper);
 		} catch (Exception e) {
-			log.info("listUserByPage 中 sortField: {}", sortField);
+			log.error("分页查询接口信息失败", e);
 			throw new BusinessException(ErrorCode.SYSTEM_ERROR);
 		}
-		return new PageVO<>(interfaceInfoPage.getRecords(), interfaceInfoPage.getCurrent(), interfaceInfoPage.getSize(), interfaceInfoPage.getTotal());
+		return new PageVO<>(queryPage.getRecords(), queryPage.getCurrent(), queryPage.getSize(), queryPage.getTotal());
+	}
+
+	@Override
+	public PageVO<InterfaceInfo> listInterfaceInfoByFuzzy(FuzzyQueryRequest fuzzyQueryRequest) {
+		List<String> fields = fuzzyQueryRequest.getFields();
+		String keyword = fuzzyQueryRequest.getKeyword();
+		if (CollectionUtil.isEmpty(fields) || StrUtil.isBlank(keyword)) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		// 拿到分页参数
+		long current = fuzzyQueryRequest.getCurrent();
+		long pageSize = fuzzyQueryRequest.getPageSize();
+		// 限制爬虫
+		if (pageSize > MAX_PAGE_SIZE) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
+		}
+		Page<InterfaceInfo> queryPage = new Page<>(current, pageSize);
+		// 不需要返回总数, 优化性能
+		queryPage.setSearchCount(false);
+		// 构建查询条件
+		QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>();
+		for (String field : fields) {
+			// 驼峰命名转下划线
+			field = StrUtil.toUnderlineCase(field);
+			queryWrapper.like(StrUtil.isNotBlank(field), field, keyword).or();
+		}
+		// 默认按更新时间排序
+		queryWrapper.orderByDesc("update_time");
+		// 执行查询
+		try {
+			queryPage = this.page(queryPage, queryWrapper);
+		} catch (Exception e) {
+			log.error("模糊查询用户列表失败", e);
+			log.error("模糊查询中 fields: {} ; keyword: {}", fields, keyword);
+			throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+		}
+		return new PageVO<>(queryPage.getRecords(), queryPage.getCurrent(), queryPage.getSize(), queryPage.getTotal());
 	}
 
 	@Override

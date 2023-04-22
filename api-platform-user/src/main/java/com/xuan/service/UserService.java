@@ -1,7 +1,8 @@
 package com.xuan.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.xuan.dto.UserQueryDTO;
+import com.xuan.common.FuzzyQueryRequest;
+import com.xuan.common.PageRequest;
 import com.xuan.model.entity.User;
 import com.xuan.model.vo.PageVO;
 import com.xuan.model.vo.UserVO;
@@ -52,11 +53,18 @@ public interface UserService extends IService<User> {
 	boolean userLogout(HttpServletRequest request);
 
 	/**
-	 * 翻页查询
+	 * 分页查询
 	 *
-	 * @param userQueryDTO 查询参数
+	 * @param pageRequest 分页查询请求
 	 * @return PageVO<UserVO>
 	 */
-	PageVO<UserVO> listUserByPage(UserQueryDTO userQueryDTO);
+	PageVO<UserVO> listUserByPage(PageRequest pageRequest);
 
+	/**
+	 * 模糊查询
+	 *
+	 * @param fuzzyQueryRequest 模糊查询请求
+	 * @return PageVO<UserVO>
+	 */
+	PageVO<UserVO> listUserByFuzzy(FuzzyQueryRequest fuzzyQueryRequest);
 }

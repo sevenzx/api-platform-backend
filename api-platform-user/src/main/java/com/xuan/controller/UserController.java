@@ -2,11 +2,10 @@ package com.xuan.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.xuan.common.*;
 import com.xuan.dto.*;
+import com.xuan.model.entity.InterfaceInfo;
 import com.xuan.model.entity.User;
-import com.xuan.common.Result;
-import com.xuan.common.DeleteRequest;
-import com.xuan.common.ErrorCode;
 import com.xuan.exception.BusinessException;
 import com.xuan.model.enums.UserRoleEnum;
 import com.xuan.model.vo.InvokeInterfaceUserVO;
@@ -183,24 +182,50 @@ public class UserController {
 	}
 
 	/**
-	 * 用户翻页查询
+	 * 分页查询
 	 *
-	 * @param userQueryDTO 查询参数
-	 * @param request      HttpServletRequest
+	 * @param pageRequest 分页查询请求
+	 * @param request     HttpServletRequest
 	 * @return Page<UserVO>
 	 */
 	@PostMapping("/list/page")
-	public Result<PageVO<UserVO>> listUserByPage(@RequestBody UserQueryDTO userQueryDTO, HttpServletRequest request) {
-		if (!hasAdminPermission(request)) {
-			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
-		}
-		if (userQueryDTO == null) {
+	public Result<PageVO<UserVO>> listUserByPage(@RequestBody PageRequest pageRequest, HttpServletRequest request) {
+		// if (!hasAdminPermission(request)) {
+		// 	throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
+		// }
+		if (pageRequest == null) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
-		PageVO<UserVO> pageVO = userService.listUserByPage(userQueryDTO);
+		PageVO<UserVO> pageVO = userService.listUserByPage(pageRequest);
 		return Result.success(pageVO);
 	}
 
+	/**
+	 * 模糊查询
+	 *
+	 * @param fuzzyQueryRequest 模糊查询请求
+	 * @return Page<InterfaceInfo>
+	 */
+	@PostMapping("/list/fuzzy")
+	public Result<PageVO<UserVO>> listUserByFuzzy(@RequestBody FuzzyQueryRequest fuzzyQueryRequest) {
+		if (fuzzyQueryRequest == null) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		String keyword = fuzzyQueryRequest.getKeyword();
+		if (StrUtil.isBlank(keyword)) {
+			return Result.success(null);
+		}
+		PageVO<UserVO> list = userService.listUserByFuzzy(fuzzyQueryRequest);
+		return Result.success(list);
+	}
+
+
+	/**
+	 * 根据用户 key 获取用户 secret
+	 *
+	 * @param userKey 用户 key
+	 * @return Result<InvokeInterfaceUserVO>
+	 */
 	@GetMapping("/get/secret")
 	public Result<InvokeInterfaceUserVO> getSecretByKey(@RequestParam(value = "userKey") String userKey) {
 		LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();

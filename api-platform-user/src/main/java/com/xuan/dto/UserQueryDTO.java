@@ -1,8 +1,6 @@
 package com.xuan.dto;
 
-import com.xuan.common.PageRequest;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,48 +10,47 @@ import java.util.Date;
  *
  * @author xuan
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class UserQueryDTO extends PageRequest implements Serializable {
-    /**
-     * id
-     */
-    private Long id;
+public class UserQueryDTO implements Serializable {
+	/**
+	 * id
+	 */
+	private Long id;
 
-    /**
-     * 用户昵称
-     */
-    private String username;
+	/**
+	 * 用户昵称
+	 */
+	private String username;
 
-    /**
-     * 账号
-     */
-    private String userAccount;
+	/**
+	 * 账号
+	 */
+	private String userAccount;
 
-    /**
-     * 用户头像
-     */
-    private String userAvatar;
+	/**
+	 * 用户头像
+	 */
+	private String userAvatar;
 
-    /**
-     * 性别
-     */
-    private Integer gender;
+	/**
+	 * 性别
+	 */
+	private Integer gender;
 
-    /**
-     * 用户角色: user, admin
-     */
-    private String userRole;
+	/**
+	 * 用户角色: user, admin
+	 */
+	private String userRole;
 
-    /**
-     * 创建时间
-     */
-    private Date createTime;
+	/**
+	 * 创建时间
+	 */
+	private Date createTime;
 
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
+	/**
+	 * 更新时间
+	 */
+	private Date updateTime;
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 }

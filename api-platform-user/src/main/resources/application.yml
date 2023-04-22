@@ -9,7 +9,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8088
+        server-addr: localhost:9527
   # DataSource Config
   datasource:
     druid:
@@ -44,8 +44,8 @@ mybatis-plus:
 knife4j:
   enable: true
   openapi:
-    title: "api-platform-user-service"
-    description: "api-platform-user-service"
+    title: ${spring.application.name}-openapi
+    description: ${spring.application.name}-openapi
     concat: "xuan"
     version: v1.0
     license: Apache 2.0

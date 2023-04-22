@@ -1,6 +1,7 @@
 package com.xuan.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,9 +11,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xuan.common.ErrorCode;
+import com.xuan.common.FuzzyQueryRequest;
+import com.xuan.common.PageRequest;
 import com.xuan.exception.BusinessException;
 import com.xuan.mapper.UserMapper;
-import com.xuan.dto.UserQueryDTO;
 import com.xuan.model.entity.User;
 import com.xuan.model.vo.PageVO;
 import com.xuan.model.vo.UserVO;
@@ -190,51 +192,94 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 	}
 
 	@Override
-	public PageVO<UserVO> listUserByPage(UserQueryDTO userQueryDTO) {
+	public PageVO<UserVO> listUserByPage(PageRequest pageRequest) {
 
-		if (userQueryDTO == null) {
+		if (pageRequest == null) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
 
-		// 拿到基础字段
-		long current = userQueryDTO.getCurrent();
-		long pageSize = userQueryDTO.getPageSize();
-		String sortField = StrUtil.toUnderlineCase(userQueryDTO.getSortField());
-		String username = userQueryDTO.getUsername();
-		boolean isAscend = userQueryDTO.isAscend();
-		boolean needTotal = userQueryDTO.isNeedTotal();
-		// 用于模糊查询
-		userQueryDTO.setUsername(null);
+		// 拿到分页参数
+		long current = pageRequest.getCurrent();
+		long pageSize = pageRequest.getPageSize();
+		boolean needTotal = pageRequest.isNeedTotal();
+
+		// 限制爬虫
 		if (pageSize > MAX_PAGE_SIZE) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
 		}
+		// 更新时间倒序排序
+		LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.orderByDesc(User::getUpdateTime);
 
 		// 分页查询
-		User queryUser = BeanUtil.copyProperties(userQueryDTO, User.class);
-		QueryWrapper<User> queryWrapper = new QueryWrapper<>(queryUser);
-		queryWrapper.orderBy(StrUtil.isNotBlank(sortField), isAscend, sortField);
-		queryWrapper.like(StrUtil.isNotBlank(username), "username", username);
 		Page<User> userPage = new Page<>(current, pageSize);
 		// 设置是否返回总量total
 		userPage.setSearchCount(needTotal);
 		try {
 			userPage = this.page(userPage, queryWrapper);
 		} catch (Exception e) {
-			log.info("listUserByPage 中 sortField: {}", sortField);
+			log.error("分页查询用户列表失败", e);
 			throw new BusinessException(ErrorCode.SYSTEM_ERROR);
 		}
 
 		// 信息脱敏、封装数据
-		List<UserVO> userVOList = userPage.getRecords().stream().map(user -> {
+		return getListUserVoByPage(userPage);
+	}
+
+	@Override
+	public PageVO<UserVO> listUserByFuzzy(FuzzyQueryRequest fuzzyQueryRequest) {
+		List<String> fields = fuzzyQueryRequest.getFields();
+		String keyword = fuzzyQueryRequest.getKeyword();
+		if (CollectionUtil.isEmpty(fields) || StrUtil.isBlank(keyword)) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		// 拿到分页参数
+		long current = fuzzyQueryRequest.getCurrent();
+		long pageSize = fuzzyQueryRequest.getPageSize();
+		// 限制爬虫
+		if (pageSize > MAX_PAGE_SIZE) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
+		}
+		Page<User> queryPage = new Page<>(current, pageSize);
+		// 不需要返回总数, 优化性能
+		queryPage.setSearchCount(false);
+		// 构建查询条件
+		QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+		for (String field : fields) {
+			// 驼峰命名转下划线
+			field = StrUtil.toUnderlineCase(field);
+			queryWrapper.like(StrUtil.isNotBlank(field), field, keyword).or();
+		}
+		// 默认按更新时间排序
+		queryWrapper.orderByDesc("update_time");
+		// 执行查询
+		try {
+			queryPage = this.page(queryPage, queryWrapper);
+		} catch (Exception e) {
+			log.error("模糊查询用户列表失败", e);
+			log.error("模糊查询中 fields: {} ; keyword: {}", fields, keyword);
+			throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+		}
+
+		// 信息脱敏、封装数据
+		return getListUserVoByPage(queryPage);
+	}
+
+	/**
+	 * 用户信息脱敏、封装数据
+	 *
+	 * @param queryPage 分页查询结果
+	 * @return PageVO<UserVO>
+	 */
+	private PageVO<UserVO> getListUserVoByPage(Page<User> queryPage) {
+		List<UserVO> userVOList = queryPage.getRecords().stream().map(user -> {
 			UserVO userVO = new UserVO();
 			BeanUtils.copyProperties(user, userVO);
 			return userVO;
 		}).collect(Collectors.toList());
 
-		// 封装返回数据
-		return new PageVO<>(userVOList, userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
+		return new PageVO<>(userVOList, queryPage.getCurrent(), queryPage.getSize(), queryPage.getTotal());
 	}
-
 }
 
 

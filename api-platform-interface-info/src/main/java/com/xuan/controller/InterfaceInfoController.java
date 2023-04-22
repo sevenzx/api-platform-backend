@@ -1,6 +1,6 @@
 package com.xuan.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import cn.hutool.core.util.StrUtil;
 import com.xuan.model.dto.InterfaceInfoAddDTO;
 import com.xuan.model.entity.InterfaceInfo;
 import com.xuan.common.*;
@@ -9,16 +9,13 @@ import com.xuan.exception.BusinessException;
 import com.xuan.model.vo.PageVO;
 import com.xuan.model.vo.UserVO;
 import com.xuan.service.InterfaceInfoService;
-import com.xuan.model.dto.InterfaceInfoQueryDTO;
 import com.xuan.model.dto.InterfaceInfoUpdateDTO;
 import com.xuan.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 
 /**
@@ -103,40 +100,39 @@ public class InterfaceInfoController {
 		return Result.success(interfaceInfo);
 	}
 
-	/**
-	 * 获取列表（仅管理员可使用）
-	 *
-	 * @param interfaceInfoQueryDTO InterfaceInfoQueryDTO
-	 * @return List<InterfaceInfo>
-	 */
-	@GetMapping("/list")
-	public Result<List<InterfaceInfo>> listInterfaceInfo(InterfaceInfoQueryDTO interfaceInfoQueryDTO, HttpServletRequest request) {
-		boolean currentUserIsAdmin = UserUtil.hasAdminPermission(request);
-		if (!currentUserIsAdmin) {
-			throw new BusinessException(ErrorCode.NO_PERMISSION_ERROR);
-		}
-		InterfaceInfo interfaceInfoQuery = new InterfaceInfo();
-		if (interfaceInfoQueryDTO != null) {
-			BeanUtils.copyProperties(interfaceInfoQueryDTO, interfaceInfoQuery);
-		}
-		QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>(interfaceInfoQuery);
-		List<InterfaceInfo> interfaceInfoList = interfaceInfoService.list(queryWrapper);
-		return Result.success(interfaceInfoList);
-	}
 
 	/**
-	 * 分页获取列表
+	 * 分页查询
 	 *
-	 * @param interfaceInfoQueryDTO InterfaceInfoQueryDTO
+	 * @param pageRequest 分页查询请求
 	 * @return Page<InterfaceInfo>
 	 */
 	@PostMapping("/list/page")
-	public Result<PageVO<InterfaceInfo>> listInterfaceInfoByPage(@RequestBody InterfaceInfoQueryDTO interfaceInfoQueryDTO) {
-		if (interfaceInfoQueryDTO == null) {
+	public Result<PageVO<InterfaceInfo>> listInterfaceInfoByPage(@RequestBody PageRequest pageRequest) {
+		if (pageRequest == null) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
-		PageVO<InterfaceInfo> interfaceInfoPage = interfaceInfoService.listInterfaceInfoByPage(interfaceInfoQueryDTO);
+		PageVO<InterfaceInfo> interfaceInfoPage = interfaceInfoService.listInterfaceInfoByPage(pageRequest);
 		return Result.success(interfaceInfoPage);
+	}
+
+	/**
+	 * 模糊查询
+	 *
+	 * @param fuzzyQueryRequest 模糊查询请求
+	 * @return Page<InterfaceInfo>
+	 */
+	@PostMapping("/list/fuzzy")
+	public Result<PageVO<InterfaceInfo>> listInterfaceInfoByFuzzy(@RequestBody FuzzyQueryRequest fuzzyQueryRequest) {
+		if (fuzzyQueryRequest == null) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		String keyword = fuzzyQueryRequest.getKeyword();
+		if (StrUtil.isBlank(keyword)) {
+			return Result.success(null);
+		}
+		PageVO<InterfaceInfo> list = interfaceInfoService.listInterfaceInfoByFuzzy(fuzzyQueryRequest);
+		return Result.success(list);
 	}
 
 	/**

@@ -2,7 +2,9 @@ package com.xuan.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xuan.common.DeleteRequest;
+import com.xuan.common.FuzzyQueryRequest;
 import com.xuan.common.IdRequest;
+import com.xuan.common.PageRequest;
 import com.xuan.model.dto.InterfaceInfoAddDTO;
 import com.xuan.model.dto.InterfaceInfoQueryDTO;
 import com.xuan.model.dto.InterfaceInfoUpdateDTO;
@@ -10,6 +12,7 @@ import com.xuan.model.entity.InterfaceInfo;
 import com.xuan.model.vo.PageVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author xuan
@@ -47,12 +50,20 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
 	boolean updateInterfaceInfo(InterfaceInfoUpdateDTO interfaceInfoUpdateDTO, HttpServletRequest request);
 
 	/**
-	 * 分页获取列表
+	 * 分页查询
 	 *
-	 * @param interfaceInfoQueryDTO InterfaceInfoQueryDTO
+	 * @param pageRequest PageRequest
 	 * @return Page<InterfaceInfo>
 	 */
-	PageVO<InterfaceInfo> listInterfaceInfoByPage(InterfaceInfoQueryDTO interfaceInfoQueryDTO);
+	PageVO<InterfaceInfo> listInterfaceInfoByPage(PageRequest pageRequest);
+
+	/**
+	 * 模糊查询
+	 *
+	 * @param fuzzyQueryRequest FuzzyQueryRequest
+	 * @return Page<InterfaceInfo>
+	 */
+	PageVO<InterfaceInfo> listInterfaceInfoByFuzzy(FuzzyQueryRequest fuzzyQueryRequest);
 
 	/**
 	 * 上线接口

@@ -9,7 +9,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8088
+        server-addr: localhost:9527
   # DataSource Config
   datasource:
     druid:
@@ -41,21 +41,6 @@ mybatis-plus:
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
 
-knife4j:
-  enable: true
-  openapi:
-    title: "api-platform-interface-info-service"
-    description: "api-platform-interface-info-service"
-    concat: "xuan"
-    version: v1.0
-    license: Apache 2.0
-    group:
-      default:
-        group-name: "default"
-        api-rule: package
-        api-rule-resources:
-          - com.xuan.controller
-
 # Feign调试日志是以debug级别来输出的，而springboot的默认日志级别是info，可以仅仅指定Feign接口所在包的路径为debug级别
 logging:
   level:
@@ -70,3 +55,18 @@ feign:
     enabled: true
     max-connections: 200
     max-connections-per-route: 50
+
+knife4j:
+  enable: true
+  openapi:
+    title: ${spring.application.name}-openapi
+    description: ${spring.application.name}-openapi
+    concat: "xuan"
+    version: v1.0
+    license: Apache 2.0
+    group:
+      default:
+        group-name: "default"
+        api-rule: package
+        api-rule-resources:
+          - com.xuan.controller

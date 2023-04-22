@@ -1,8 +1,6 @@
 package com.xuan.model.dto;
 
-import com.xuan.common.PageRequest;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
@@ -12,9 +10,8 @@ import java.io.Serializable;
  *
  * @author xuan
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class InterfaceInfoQueryDTO extends PageRequest implements Serializable {
+public class InterfaceInfoQueryDTO implements Serializable {
 
 	/**
 	 * 主键
@@ -65,5 +62,7 @@ public class InterfaceInfoQueryDTO extends PageRequest implements Serializable {
 	 * 创建人
 	 */
 	private Long userId;
+
+	private static final long serialVersionUID = -3298536932587655899L;
 
 }

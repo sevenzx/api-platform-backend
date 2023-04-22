@@ -9,7 +9,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8088
+        server-addr: localhost:9527
     gateway:
       routes:
         - id: user_route
@@ -24,7 +24,6 @@ spring:
           uri: lb://api-platform-interface-v1
           predicates:
             - Path=/api/v1/**
-
 
 # Feign调试日志是以debug级别来输出的，而springboot的默认日志级别是info，可以仅仅指定Feign接口所在包的路径为debug级别
 logging:
