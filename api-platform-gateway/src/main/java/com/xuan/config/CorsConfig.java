@@ -17,16 +17,18 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 public class CorsConfig {
 
 	@Bean
-	public CorsWebFilter corsWebFilter(){
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	public CorsWebFilter corsWebFilter() {
+		// 1.添加CORS配置信息
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		// 配置跨域
 		corsConfiguration.addAllowedHeader("*");
 		corsConfiguration.addAllowedMethod("*");
 		corsConfiguration.addAllowedOriginPattern("*");
 		corsConfiguration.setAllowCredentials(true);
-
+		// 2.添加映射路径，拦截一切请求
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);
+		// 3.返回新的CorsFilter
 		return new CorsWebFilter(source);
 	}
 

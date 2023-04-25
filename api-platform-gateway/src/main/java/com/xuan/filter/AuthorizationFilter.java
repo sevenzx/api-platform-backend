@@ -23,7 +23,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 
 /**
  * 调用接口鉴权过滤器
@@ -61,15 +60,7 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
 			return chain.filter(exchange);
 		}
 
-		// 1. 请求日志
-		String method = Objects.requireNonNull(request.getMethod()).toString();
-		log.info("请求id: {}", request.getId());
-		log.info("请求路径: {}", path);
-		log.info("请求方法: {}", method);
-		log.info("请求参数: {}", request.getQueryParams());
-		log.info("请求头: {}", request.getHeaders());
-		String remoteAddress = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
-		log.info("请求地址: {}", remoteAddress);
+		// 1. 请求日志 - 由于日志过滤器的优先级高于鉴权过滤器，所以这里不再打印日志
 
 		// 2. 访问控制 - 黑白名单
 		ServerHttpResponse response = exchange.getResponse();

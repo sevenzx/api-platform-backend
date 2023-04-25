@@ -166,7 +166,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 	public UserVO currentUser(HttpServletRequest request) {
 		Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
 		if (userObj == null) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+			return null;
 		}
 		UserVO user = (UserVO) userObj;
 		// 之前的信息可能被更新了 所以需要再次获取信息
@@ -187,7 +187,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 		if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
 			throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
 		}
-		request.removeAttribute(USER_LOGIN_STATE);
+		// 移除session里的用户信息
+		request.getSession().removeAttribute(USER_LOGIN_STATE);
 		return true;
 	}
 
@@ -236,13 +237,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 		// 拿到分页参数
 		long current = fuzzyQueryRequest.getCurrent();
 		long pageSize = fuzzyQueryRequest.getPageSize();
+		boolean needTotal = fuzzyQueryRequest.isNeedTotal();
 		// 限制爬虫
 		if (pageSize > MAX_PAGE_SIZE) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
 		}
 		Page<User> queryPage = new Page<>(current, pageSize);
-		// 不需要返回总数, 优化性能
-		queryPage.setSearchCount(false);
+		// 设置是否返回总量total (默认为true,设置为false可提升性能)
+		queryPage.setSearchCount(needTotal);
 		// 构建查询条件
 		QueryWrapper<User> queryWrapper = new QueryWrapper<>();
 		for (String field : fields) {

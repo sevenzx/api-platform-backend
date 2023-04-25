@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xuan.common.*;
 import com.xuan.dto.*;
-import com.xuan.model.entity.InterfaceInfo;
 import com.xuan.model.entity.User;
 import com.xuan.exception.BusinessException;
 import com.xuan.model.enums.UserRoleEnum;
@@ -91,7 +90,7 @@ public class UserController {
 	public Result<UserVO> getCurrentUser(HttpServletRequest request) {
 		Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
 		if (userObj == null) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+			return Result.error(ErrorCode.NOT_LOGIN_ERROR);
 		}
 		UserVO userVO = userService.currentUser(request);
 		return Result.success(userVO);

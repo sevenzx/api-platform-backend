@@ -119,13 +119,14 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 		// 拿到分页参数
 		long current = fuzzyQueryRequest.getCurrent();
 		long pageSize = fuzzyQueryRequest.getPageSize();
+		boolean needTotal = fuzzyQueryRequest.isNeedTotal();
 		// 限制爬虫
 		if (pageSize > MAX_PAGE_SIZE) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
 		}
 		Page<InterfaceInfo> queryPage = new Page<>(current, pageSize);
-		// 不需要返回总数, 优化性能
-		queryPage.setSearchCount(false);
+		// 设置是否返回总量total (默认为true,设置为false可提升性能)
+		queryPage.setSearchCount(needTotal);
 		// 构建查询条件
 		QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>();
 		for (String field : fields) {
