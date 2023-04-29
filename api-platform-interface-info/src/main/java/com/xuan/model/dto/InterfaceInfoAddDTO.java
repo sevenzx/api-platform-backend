@@ -24,9 +24,9 @@ public class InterfaceInfoAddDTO implements Serializable {
 	private String description;
 
 	/**
-	 * 接口地址
+	 * 接口路径
 	 */
-	private String url;
+	private String path;
 
 	/**
 	 * 请求头

@@ -1,6 +1,7 @@
 package com.xuan.common;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  */
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class FuzzyQueryRequest extends PageRequest {
 
 	/**

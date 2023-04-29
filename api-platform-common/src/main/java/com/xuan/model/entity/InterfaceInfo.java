@@ -9,6 +9,7 @@ import java.util.Date;
 /**
  * 接口信息
  *
+ * @author xuan
  * @TableName interface_info
  */
 @TableName(value ="interface_info")
@@ -32,9 +33,9 @@ public class InterfaceInfo implements Serializable {
     private String description;
 
     /**
-     * 接口地址
+     * 接口路径
      */
-    private String url;
+    private String path;
 
     /**
      * 请求头

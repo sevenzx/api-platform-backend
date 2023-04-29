@@ -1,10 +1,7 @@
 package com.xuan.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xuan.common.*;
@@ -16,6 +13,7 @@ import com.xuan.model.entity.InterfaceInfo;
 import com.xuan.model.enums.InterfaceInfoStatusEnum;
 import com.xuan.model.vo.PageVO;
 import com.xuan.model.vo.UserVO;
+import com.xuan.service.CommonService;
 import com.xuan.service.InterfaceInfoService;
 import com.xuan.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
-import static com.xuan.constant.CommonConstant.MAX_PAGE_SIZE;
 
 /**
  * @author xuan
@@ -83,67 +79,15 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
 	@Override
 	public PageVO<InterfaceInfo> listInterfaceInfoByPage(PageRequest pageRequest) {
-		if (pageRequest == null) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR);
-		}
-		// 拿到分页参数
-		long current = pageRequest.getCurrent();
-		long pageSize = pageRequest.getPageSize();
-		boolean needTotal = pageRequest.isNeedTotal();
-		// 限制爬虫
-		if (pageSize > MAX_PAGE_SIZE) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
-		}
-		// 更新时间倒序
-		LambdaQueryWrapper<InterfaceInfo> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.orderByDesc(InterfaceInfo::getUpdateTime);
-		Page<InterfaceInfo> queryPage = new Page<>(current, pageSize);
-		// 设置是否需要翻页
-		queryPage.setSearchCount(needTotal);
-		try {
-			queryPage = this.page(queryPage, queryWrapper);
-		} catch (Exception e) {
-			log.error("分页查询接口信息失败", e);
-			throw new BusinessException(ErrorCode.SYSTEM_ERROR);
-		}
+		Page<InterfaceInfo> queryPage = CommonService.listByPage(this, pageRequest);
 		return new PageVO<>(queryPage.getRecords(), queryPage.getCurrent(), queryPage.getSize(), queryPage.getTotal());
 	}
 
 	@Override
 	public PageVO<InterfaceInfo> listInterfaceInfoByFuzzy(FuzzyQueryRequest fuzzyQueryRequest) {
-		List<String> fields = fuzzyQueryRequest.getFields();
-		String keyword = fuzzyQueryRequest.getKeyword();
-		if (CollectionUtil.isEmpty(fields) || StrUtil.isBlank(keyword)) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR);
-		}
-		// 拿到分页参数
-		long current = fuzzyQueryRequest.getCurrent();
-		long pageSize = fuzzyQueryRequest.getPageSize();
-		boolean needTotal = fuzzyQueryRequest.isNeedTotal();
-		// 限制爬虫
-		if (pageSize > MAX_PAGE_SIZE) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
-		}
-		Page<InterfaceInfo> queryPage = new Page<>(current, pageSize);
-		// 设置是否返回总量total (默认为true,设置为false可提升性能)
-		queryPage.setSearchCount(needTotal);
-		// 构建查询条件
-		QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>();
-		for (String field : fields) {
-			// 驼峰命名转下划线
-			field = StrUtil.toUnderlineCase(field);
-			queryWrapper.like(StrUtil.isNotBlank(field), field, keyword).or();
-		}
-		// 默认按更新时间排序
-		queryWrapper.orderByDesc("update_time");
-		// 执行查询
-		try {
-			queryPage = this.page(queryPage, queryWrapper);
-		} catch (Exception e) {
-			log.error("模糊查询用户列表失败", e);
-			log.error("模糊查询中 fields: {} ; keyword: {}", fields, keyword);
-			throw new BusinessException(ErrorCode.SYSTEM_ERROR);
-		}
+
+		Page<InterfaceInfo> queryPage = CommonService.listByFuzzy(this, fuzzyQueryRequest);
+
 		return new PageVO<>(queryPage.getRecords(), queryPage.getCurrent(), queryPage.getSize(), queryPage.getTotal());
 	}
 
@@ -197,7 +141,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
 		String name = interfaceInfo.getName();
 		String description = interfaceInfo.getDescription();
-		String url = interfaceInfo.getUrl();
+		String path = interfaceInfo.getPath();
 		String requestHeader = interfaceInfo.getRequestHeader();
 		String responseHeader = interfaceInfo.getResponseHeader();
 		String method = interfaceInfo.getMethod();
@@ -205,7 +149,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
 		// 创建时，所有参数必须非空
 		if (add) {
-			if (StrUtil.hasBlank(name, description, url, requestHeader, responseHeader, method) || ObjectUtil.isNotNull(userId)) {
+			if (StrUtil.hasBlank(name, description, path, requestHeader, responseHeader, method) || ObjectUtil.isNotNull(userId)) {
 				throw new BusinessException(ErrorCode.PARAMS_ERROR);
 			}
 		}

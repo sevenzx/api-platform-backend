@@ -28,8 +28,8 @@ public class LogFilter implements GlobalFilter, Ordered {
 
 		// 请求日志
 		String method = Objects.requireNonNull(request.getMethod()).toString();
-		log.info("请求id: {}", request.getId());
 		String remoteAddress = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
+		log.info("请求id: {}", request.getId());
 		log.info("请求地址: {}", remoteAddress);
 		log.info("请求路径: {}", path);
 		log.info("请求方法: {}", method);

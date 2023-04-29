@@ -21,16 +21,6 @@ public class PageRequest {
 	private long pageSize = 10;
 
 	/**
-	 * 排序字段
-	 */
-	private String sortField;
-
-	/**
-	 * 升序 true/false（默认升序）
-	 */
-	private boolean ascend = true;
-
-	/**
 	 * 是否查询总量total 默认为true
 	 */
 	private boolean needTotal = true;

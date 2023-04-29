@@ -1,13 +1,11 @@
 package com.xuan.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xuan.common.ErrorCode;
@@ -18,6 +16,7 @@ import com.xuan.mapper.UserMapper;
 import com.xuan.model.entity.User;
 import com.xuan.model.vo.PageVO;
 import com.xuan.model.vo.UserVO;
+import com.xuan.service.CommonService;
 import com.xuan.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -27,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.xuan.constant.CommonConstant.MAX_PAGE_SIZE;
 import static com.xuan.constant.CommonConstant.USER_LOGIN_STATE;
 
 /**
@@ -48,7 +46,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 	/**
 	 * 用户默认头像
 	 */
-	private static final String USER_DEFAULT_AVATAR = "https://iconfont.alicdn.com/p/illus/preview_image/vi0tksaEBKx4/d25a9590-29c8-4d43-94f1-c7ca62e1d1c4.png";
+	private static final String USER_DEFAULT_AVATAR = "https://s2.loli.net/2023/04/26/IS185lD9XzvMfwq.png";
 
 	/**
 	 * 用户账户正则
@@ -185,7 +183,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 	@Override
 	public boolean userLogout(HttpServletRequest request) {
 		if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
-			throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
+			throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
 		}
 		// 移除session里的用户信息
 		request.getSession().removeAttribute(USER_LOGIN_STATE);
@@ -195,33 +193,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 	@Override
 	public PageVO<UserVO> listUserByPage(PageRequest pageRequest) {
 
-		if (pageRequest == null) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR);
-		}
-
-		// 拿到分页参数
-		long current = pageRequest.getCurrent();
-		long pageSize = pageRequest.getPageSize();
-		boolean needTotal = pageRequest.isNeedTotal();
-
-		// 限制爬虫
-		if (pageSize > MAX_PAGE_SIZE) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
-		}
-		// 更新时间倒序排序
-		LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.orderByDesc(User::getUpdateTime);
-
-		// 分页查询
-		Page<User> userPage = new Page<>(current, pageSize);
-		// 设置是否返回总量total
-		userPage.setSearchCount(needTotal);
-		try {
-			userPage = this.page(userPage, queryWrapper);
-		} catch (Exception e) {
-			log.error("分页查询用户列表失败", e);
-			throw new BusinessException(ErrorCode.SYSTEM_ERROR);
-		}
+		Page<User> userPage = CommonService.listByPage(this, pageRequest);
 
 		// 信息脱敏、封装数据
 		return getListUserVoByPage(userPage);
@@ -229,39 +201,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 	@Override
 	public PageVO<UserVO> listUserByFuzzy(FuzzyQueryRequest fuzzyQueryRequest) {
-		List<String> fields = fuzzyQueryRequest.getFields();
-		String keyword = fuzzyQueryRequest.getKeyword();
-		if (CollectionUtil.isEmpty(fields) || StrUtil.isBlank(keyword)) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR);
-		}
-		// 拿到分页参数
-		long current = fuzzyQueryRequest.getCurrent();
-		long pageSize = fuzzyQueryRequest.getPageSize();
-		boolean needTotal = fuzzyQueryRequest.isNeedTotal();
-		// 限制爬虫
-		if (pageSize > MAX_PAGE_SIZE) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR, "pageSize不得超过" + MAX_PAGE_SIZE);
-		}
-		Page<User> queryPage = new Page<>(current, pageSize);
-		// 设置是否返回总量total (默认为true,设置为false可提升性能)
-		queryPage.setSearchCount(needTotal);
-		// 构建查询条件
-		QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-		for (String field : fields) {
-			// 驼峰命名转下划线
-			field = StrUtil.toUnderlineCase(field);
-			queryWrapper.like(StrUtil.isNotBlank(field), field, keyword).or();
-		}
-		// 默认按更新时间排序
-		queryWrapper.orderByDesc("update_time");
-		// 执行查询
-		try {
-			queryPage = this.page(queryPage, queryWrapper);
-		} catch (Exception e) {
-			log.error("模糊查询用户列表失败", e);
-			log.error("模糊查询中 fields: {} ; keyword: {}", fields, keyword);
-			throw new BusinessException(ErrorCode.SYSTEM_ERROR);
-		}
+
+		Page<User> queryPage = CommonService.listByFuzzy(this, fuzzyQueryRequest);
 
 		// 信息脱敏、封装数据
 		return getListUserVoByPage(queryPage);
