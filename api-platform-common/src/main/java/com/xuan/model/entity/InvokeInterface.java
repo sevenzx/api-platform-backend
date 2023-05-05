@@ -43,7 +43,7 @@ public class InvokeInterface implements Serializable {
     private Integer leftNum;
 
     /**
-     * 0-正常 ，1-禁用
+     * 0-禁用 ，1-正常
      */
     private Integer status;
 

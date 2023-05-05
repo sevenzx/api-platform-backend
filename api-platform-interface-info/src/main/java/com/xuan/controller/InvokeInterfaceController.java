@@ -1,6 +1,7 @@
 package com.xuan.controller;
 
 import com.xuan.common.Result;
+import com.xuan.model.entity.InvokeInterface;
 import com.xuan.service.InvokeInterfaceService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,14 @@ public class InvokeInterfaceController {
 
 	@Resource
 	InvokeInterfaceService invokeInterfaceService;
+
+	@GetMapping(value = "/getByUserIdAndPathAndMethod")
+	public Result<InvokeInterface> selectByUserIdPathAndMethod(@RequestParam(value = "userId") long userId,
+	                                                           @RequestParam(value = "path") String path,
+	                                                           @RequestParam(value = "method") String method) {
+		InvokeInterface invokeInterface = invokeInterfaceService.selectByUserIdPathAndMethod(userId, path, method);
+		return Result.success(invokeInterface);
+	}
 
 	@GetMapping(value = "/hasNum")
 	public Result<Boolean> hasInvokeNum(@RequestParam(value = "userId") long userId,

@@ -7,6 +7,7 @@ import com.xuan.client.InvokeInterfaceClient;
 import com.xuan.client.UserClient;
 import com.xuan.common.ErrorCode;
 import com.xuan.common.Result;
+import com.xuan.model.entity.InvokeInterface;
 import com.xuan.model.vo.InvokeInterfaceUserVO;
 import com.xuan.util.SignUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,16 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
 	 */
 	private static final long LIMIT_TIME = 1000 * 60 * 1000L;
 
+	/**
+	 * 在线调用KEY
+	 */
+	private static final String CLIENT_KEY = "cli_299217f2d82b4a310b7c377b5dfceec8";
+
+	/**
+	 * 在线调用SECRET
+	 */
+	private static final String CLIENT_SECRET = "b4ec0523ea00a59f89a511354f091e23";
+
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 		ServerHttpRequest request = exchange.getRequest();
@@ -78,8 +89,16 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
 			return handleNoPermission(response);
 		}
 
+		// 4.1. 是否是在线调用
+		if (StrUtil.equals(userKey, CLIENT_KEY)) {
+			String sign1 = SignUtil.getSign(timestamp, CLIENT_SECRET);
+			if (!StrUtil.equals(sign, sign1)) {
+				return handleNoPermission(response);
+			}
+			return chain.filter(exchange);
+		}
 
-		// 通过key查到secret再计算sign进行比对
+		// 4.2. 通过key查到secret再计算sign进行比对
 		Result<InvokeInterfaceUserVO> result = userClient.getSecretByKey(userKey);
 
 		InvokeInterfaceUserVO invokeInterfaceUserVO = result.getData();
@@ -94,24 +113,29 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
 			return handleNoPermission(response);
 		}
 
-		// 规定时间内的请求有效
+		// 4.3. 规定时间内的请求有效
 		if (!(NumberUtil.isNumber(timestamp) && System.currentTimeMillis() - Long.parseLong(timestamp) <= LIMIT_TIME)) {
 			return handleNoPermission(response, "timestamp is invalid");
 		}
-		// TODO 请求的接口是否存在 使用路径, 请求方法去查数据库
-		// SELECT * FROM invoke_interface
-		// WHERE `id` = 1
-		// AND `interface_info_id` = ( SELECT `id` FROM interface_info WHERE`url` = 'http://localhost:8888' AND `method` = 'POST' )
 
-		long interfaceInfoId = 1L;
-		Result<Boolean> booleanResult = invokeInterfaceClient.hasInvokeNum(userId, interfaceInfoId);
-		if (!booleanResult.getData()) {
+		// 5. 获取调用信息
+		Result<InvokeInterface> result1 = invokeInterfaceClient.selectByUserIdPathAndMethod(userId, path, request.getMethodValue());
+		InvokeInterface invokeInterface = result1.getData();
+		if (invokeInterface == null) {
+			return handleNoPermission(response, "interface is not exist");
+		}
+
+		if (invokeInterface.getLeftNum() <= 0) {
 			return handleNoPermission(response, "has no invoke num");
 		}
 
-		// 5. 请求转发，调用模拟接口
+		if (invokeInterface.getStatus() != 1) {
+			return handleNoPermission(response, "interface is not enable");
+		}
+
+		// 6. 请求转发，调用模拟接口
 		// TODO 确认调用接口成功后再计数
-		invokeInterfaceClient.count(userId, interfaceInfoId);
+		invokeInterfaceClient.count(userId, invokeInterface.getInterfaceInfoId());
 		return chain.filter(exchange);
 	}
 

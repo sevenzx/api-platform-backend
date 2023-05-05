@@ -11,6 +11,17 @@ import com.xuan.model.entity.InvokeInterface;
 public interface InvokeInterfaceService extends IService<InvokeInterface> {
 
 	/**
+	 * 根据用户id、path、method查询
+	 *
+	 * @param userId 用户id
+	 * @param path   接口路径
+	 * @param method 接口请求方法
+	 * @return InvokeInterface
+	 */
+	InvokeInterface selectByUserIdPathAndMethod(long userId, String path, String method);
+
+
+	/**
 	 * 该用户是否能够调用该接口
 	 *
 	 * @param userId          用户id

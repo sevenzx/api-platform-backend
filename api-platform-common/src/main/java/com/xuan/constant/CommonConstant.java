@@ -20,7 +20,7 @@ public interface CommonConstant {
 	/**
 	 * 降序
 	 */
-	String SORT_ORDER_DESC = " descend";
+	String SORT_ORDER_DESC = "descend";
 
 	/**
 	 * 翻页时页面最大容量

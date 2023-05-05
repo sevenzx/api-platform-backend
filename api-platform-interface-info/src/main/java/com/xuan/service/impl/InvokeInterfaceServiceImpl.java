@@ -13,16 +13,25 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
-* @author xuan
-* @description 针对表【invoke_interface(用户调用接口关系表)】的数据库操作Service实现
-* @createDate 2023-03-30 15:31:14
-*/
+ * @author xuan
+ * @description 针对表【invoke_interface(用户调用接口关系表)】的数据库操作Service实现
+ * @createDate 2023-03-30 15:31:14
+ */
 @Service
 public class InvokeInterfaceServiceImpl extends ServiceImpl<InvokeInterfaceMapper, InvokeInterface>
-    implements InvokeInterfaceService {
+		implements InvokeInterfaceService {
 
 	@Resource
 	InvokeInterfaceMapper invokeInterfaceMapper;
+
+	@Override
+	public InvokeInterface selectByUserIdPathAndMethod(long userId, String path, String method) {
+		if (userId <= 0 || path == null || method == null) {
+			throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+		}
+
+		return invokeInterfaceMapper.selectByUserIdPathAndMethod(userId, path, method);
+	}
 
 	@Override
 	public boolean hasInvokeNum(long userId, long interfaceInfoId) {

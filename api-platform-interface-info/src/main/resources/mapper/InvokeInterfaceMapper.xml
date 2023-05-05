@@ -21,4 +21,11 @@
         total_num,left_num,status,
         create_time,update_time,is_delete
     </sql>
+    <select id="selectByUserIdPathAndMethod" resultType="com.xuan.model.entity.InvokeInterface">
+        SELECT *
+        FROM invoke_interface
+        WHERE `user_id` = #{userId}
+          AND `interface_info_id` =
+              (SELECT `id` FROM interface_info WHERE `path` = #{path} AND `method` = #{method})
+    </select>
 </mapper>
