@@ -6,6 +6,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
+import static org.springframework.web.cors.CorsConfiguration.ALL;
+
 /**
  * 跨域配置
  *
@@ -21,9 +23,9 @@ public class CorsConfig {
 		// 1.添加CORS配置信息
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		// 配置跨域
-		corsConfiguration.addAllowedHeader("*");
-		corsConfiguration.addAllowedMethod("*");
-		corsConfiguration.addAllowedOriginPattern("*");
+		corsConfiguration.addAllowedHeader(ALL);
+		corsConfiguration.addAllowedMethod(ALL);
+		corsConfiguration.addAllowedOriginPattern(ALL);
 		corsConfiguration.setAllowCredentials(true);
 		// 2.添加映射路径，拦截一切请求
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

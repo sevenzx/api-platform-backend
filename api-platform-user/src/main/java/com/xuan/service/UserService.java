@@ -8,6 +8,8 @@ import com.xuan.model.vo.PageVO;
 import com.xuan.model.vo.UserVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author: xuan
@@ -67,4 +69,12 @@ public interface UserService extends IService<User> {
 	 * @return PageVO<UserVO>
 	 */
 	PageVO<UserVO> listUserByFuzzy(FuzzyQueryRequest fuzzyQueryRequest);
+
+	/**
+	 * 根据id查询
+	 *
+	 * @param ids id列表
+	 * @return Map<Long, UserVO>
+	 */
+	Map<Long, UserVO> listUserByIds(List<Long> ids);
 }

@@ -57,4 +57,5 @@ public class InterfaceInfoUpdateDTO implements Serializable {
      */
     private String method;
 
+    private static final long serialVersionUID = 3632144412363844454L;
 }

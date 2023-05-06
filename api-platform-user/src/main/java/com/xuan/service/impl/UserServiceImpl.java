@@ -1,6 +1,7 @@
 package com.xuan.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.xuan.constant.CommonConstant.USER_LOGIN_STATE;
@@ -206,6 +208,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 		// 信息脱敏、封装数据
 		return getListUserVoByPage(queryPage);
+	}
+
+	@Override
+	public Map<Long, UserVO> listUserByIds(List<Long> ids) {
+		if (CollUtil.isEmpty(ids)) {
+			return null;
+		}
+		List<User> userList = this.listByIds(ids);
+		return userList.stream()
+				.collect(Collectors.toMap(User::getId, user -> {
+					UserVO userVO = new UserVO();
+					BeanUtils.copyProperties(user, userVO);
+					return userVO;
+				}));
 	}
 
 	/**

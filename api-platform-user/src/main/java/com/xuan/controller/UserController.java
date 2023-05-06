@@ -1,5 +1,6 @@
 package com.xuan.controller;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xuan.common.*;
@@ -16,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.xuan.constant.CommonConstant.USER_LOGIN_STATE;
 
@@ -216,6 +220,15 @@ public class UserController {
 		}
 		PageVO<UserVO> list = userService.listUserByFuzzy(fuzzyQueryRequest);
 		return Result.success(list);
+	}
+
+	@PostMapping("/list/ids")
+	public Result<Map<Long, UserVO>> listUserByIds(@RequestBody List<Long> ids) {
+		if (CollUtil.isEmpty(ids)) {
+			return Result.success(null);
+		}
+		Map<Long, UserVO> map = userService.listUserByIds(ids);
+		return Result.success(map);
 	}
 
 
