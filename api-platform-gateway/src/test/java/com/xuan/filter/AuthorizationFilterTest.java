@@ -3,7 +3,7 @@ package com.xuan.filter;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.xuan.util.SignUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
@@ -32,5 +32,6 @@ public class AuthorizationFilterTest {
 		System.out.println("userKey = " + userKey);
 		System.out.println("userSecret = " + userSecret);
 	}
+
 
 }

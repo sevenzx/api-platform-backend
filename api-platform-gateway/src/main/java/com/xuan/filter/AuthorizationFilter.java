@@ -11,6 +11,8 @@ import com.xuan.model.entity.InvokeInterface;
 import com.xuan.model.vo.InvokeInterfaceUserVO;
 import com.xuan.util.SignUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -34,6 +36,7 @@ import javax.annotation.Resource;
 
 @Slf4j
 @Component
+@RefreshScope  // 动态刷新
 public class AuthorizationFilter implements GlobalFilter, Ordered {
 
 	@Resource
@@ -55,12 +58,14 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
 	/**
 	 * 在线调用KEY
 	 */
-	private static final String CLIENT_KEY = "cli_299217f2d82b4a310b7c377b5dfceec8";
+	@Value("${config.client.key}")
+	private String clientKey;
 
 	/**
 	 * 在线调用SECRET
 	 */
-	private static final String CLIENT_SECRET = "b4ec0523ea00a59f89a511354f091e23";
+	@Value("${config.client.secret}")
+	private String clientSecret;
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -90,8 +95,8 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
 		}
 
 		// 4.1. 是否是在线调用
-		if (StrUtil.equals(userKey, CLIENT_KEY)) {
-			String sign1 = SignUtil.getSign(timestamp, CLIENT_SECRET);
+		if (StrUtil.equals(userKey, clientKey)) {
+			String sign1 = SignUtil.getSign(timestamp, clientSecret);
 			if (!StrUtil.equals(sign, sign1)) {
 				return handleNoPermission(response);
 			}

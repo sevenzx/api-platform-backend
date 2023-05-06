@@ -4,11 +4,16 @@ server:
 spring:
   application:
     name: api-platform-gateway
+  config:
+    # Nacos Data ID
+    import: nacos:api-platform-gateway-dev.yaml
   main:
     web-application-type: reactive
   cloud:
     nacos:
       discovery:
+        server-addr: localhost:9527
+      config:
         server-addr: localhost:9527
     gateway:
       routes:
