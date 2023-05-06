@@ -152,7 +152,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 		if (originUser == null) {
 			log.info("user login failed,please check whether the account and password match");
-			throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+			throw new BusinessException(ErrorCode.OPERATION_ERROR, "login failed");
 		}
 
 		// 3.信息脱敏
