@@ -171,13 +171,15 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
 						DataBufferUtils.release(dataBuffer);
 						// response body 里的内容
 						String s = new String(content, StandardCharsets.UTF_8);
+						System.out.println("s = " + s);
 						JSONObject jsonObject = JSONUtil.parseObj(s);
 						Integer code = jsonObject.getInt("code");
 						if (code == 0) {
 							// 调用成功，减少调用次数
+							// 异步调用，不影响主流程
 							Mono.just(userId)
-									.flatMap(userId -> Mono.fromCallable(() -> invokeInterfaceClient.count(userId, interfaceId))
-											.subscribeOn(Schedulers.boundedElastic()))
+									.map(id -> invokeInterfaceClient.count(id, interfaceId))
+									.subscribeOn(Schedulers.boundedElastic())
 									.subscribe();
 						} else {
 							log.error("调用失败, 返回值为: {}", s);
