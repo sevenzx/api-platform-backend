@@ -14,6 +14,7 @@ import com.xuan.model.vo.UserVO;
 import com.xuan.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -174,14 +175,14 @@ public class UserController {
 	 * @return Result<UserVO>
 	 */
 	@GetMapping("/get/{id}")
-	public Result<UserVO> getUserById(@PathVariable("id") Long id) {
+	public Mono<Result<UserVO>> getUserById(@PathVariable("id") Long id) {
 		if (id <= 0L) {
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
 		User user = userService.getById(id);
 		UserVO userVO = new UserVO();
 		BeanUtils.copyProperties(user, userVO);
-		return Result.success(userVO);
+		return Mono.just(Result.success(userVO));
 	}
 
 	/**
@@ -239,7 +240,7 @@ public class UserController {
 	 * @return Result<InvokeInterfaceUserVO>
 	 */
 	@GetMapping("/get/secret")
-	public Result<InvokeInterfaceUserVO> getSecretByKey(@RequestParam(value = "userKey") String userKey) {
+	public InvokeInterfaceUserVO getSecretByKey(@RequestParam(value = "userKey") String userKey) {
 		LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(User::getUserKey, userKey);
 		User user = userService.getOne(queryWrapper);
@@ -248,7 +249,7 @@ public class UserController {
 			invokeInterfaceUserVO.setId(user.getId());
 			invokeInterfaceUserVO.setUserSecret(user.getUserSecret());
 		}
-		return Result.success(invokeInterfaceUserVO);
+		return invokeInterfaceUserVO;
 	}
 
 

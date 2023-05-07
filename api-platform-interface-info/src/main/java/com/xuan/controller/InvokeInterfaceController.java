@@ -23,25 +23,17 @@ public class InvokeInterfaceController {
 	InvokeInterfaceService invokeInterfaceService;
 
 	@GetMapping(value = "/getByUserIdAndPathAndMethod")
-	public Result<InvokeInterface> selectByUserIdPathAndMethod(@RequestParam(value = "userId") long userId,
-	                                                           @RequestParam(value = "path") String path,
-	                                                           @RequestParam(value = "method") String method) {
-		InvokeInterface invokeInterface = invokeInterfaceService.selectByUserIdPathAndMethod(userId, path, method);
-		return Result.success(invokeInterface);
+	public InvokeInterface selectByUserIdPathAndMethod(@RequestParam(value = "userId") long userId,
+	                                                   @RequestParam(value = "path") String path,
+	                                                   @RequestParam(value = "method") String method) {
+		return invokeInterfaceService.selectByUserIdPathAndMethod(userId, path, method);
 	}
 
-	@GetMapping(value = "/hasNum")
-	public Result<Boolean> hasInvokeNum(@RequestParam(value = "userId") long userId,
-	                                    @RequestParam(value = "interfaceInfoId") long interfaceInfoId) {
-		boolean b = invokeInterfaceService.hasInvokeNum(userId, interfaceInfoId);
-		return Result.success(b);
-	}
 
 	@GetMapping(value = "/count")
-	public Result<Boolean> count(@RequestParam(value = "userId") long userId,
+	public Boolean count(@RequestParam(value = "userId") long userId,
 	                             @RequestParam(value = "interfaceInfoId") long interfaceInfoId) {
-		boolean b = invokeInterfaceService.invokeInterfaceCount(userId, interfaceInfoId);
-		return Result.success(b);
+		return invokeInterfaceService.invokeInterfaceCount(userId, interfaceInfoId);
 	}
 
 }

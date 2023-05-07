@@ -34,21 +34,6 @@ public class InvokeInterfaceServiceImpl extends ServiceImpl<InvokeInterfaceMappe
 	}
 
 	@Override
-	public boolean hasInvokeNum(long userId, long interfaceInfoId) {
-		if (userId <= 0 || interfaceInfoId <= 0) {
-			throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
-		}
-
-		LambdaQueryWrapper<InvokeInterface> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(InvokeInterface::getUserId, userId)
-				.eq(InvokeInterface::getInterfaceInfoId, interfaceInfoId)
-				.gt(InvokeInterface::getLeftNum, 0);
-
-		InvokeInterface invokeInterface = invokeInterfaceMapper.selectOne(queryWrapper);
-		return invokeInterface != null;
-	}
-
-	@Override
 	public boolean invokeInterfaceCount(long userId, long interfaceInfoId) {
 		if (userId <= 0 || interfaceInfoId <= 0) {
 			throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);

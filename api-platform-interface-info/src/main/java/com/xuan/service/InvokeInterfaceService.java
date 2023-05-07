@@ -22,16 +22,6 @@ public interface InvokeInterfaceService extends IService<InvokeInterface> {
 
 
 	/**
-	 * 该用户是否能够调用该接口
-	 *
-	 * @param userId          用户id
-	 * @param interfaceInfoId 接口id
-	 * @return boolean
-	 */
-	boolean hasInvokeNum(long userId, long interfaceInfoId);
-
-
-	/**
 	 * 接口调用成功后计数
 	 *
 	 * @param userId          用户id
